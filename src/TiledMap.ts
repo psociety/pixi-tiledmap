@@ -21,51 +21,57 @@ export default class TiledMap extends PIXI.Container {
 
   constructor(public resourceUrl: string) {
     super();
-
-    const loaderPlugin = new TiledMapLoader();
-    PIXI.Loader.registerPlugin(loaderPlugin);
-
-    const loader = new PIXI.Loader();
-    loader.add(resourceUrl).load(this.onResourceLoaded);
   }
 
-  private onResourceLoaded = (
-    loader: PIXI.Loader,
-    resources: PIXI.IResourceDictionary
-  ) => {
-    const resource = resources[this.resourceUrl];
-    const route = path.dirname(resource.url);
-    const { data } = resource;
+  public async load() {
+    return new Promise(resolve => {
+      const loaderPlugin = new TiledMapLoader();
+      PIXI.Loader.registerPlugin(loaderPlugin);
 
-    this.background.beginFill(0x000000, 0);
-    this.background.drawRect(
-      0,
-      0,
-      (this._width || 0) * (this.tileWidth || 0),
-      (this._height || 0) * (this.tileHeight || 0)
-    );
-    this.background.endFill();
-    this.addChild(this.background);
+      const loader = new PIXI.Loader();
+      loader
+        .add(this.resourceUrl)
+        .load(
+          (loaderCopy: PIXI.Loader, resources: PIXI.IResourceDictionary) => {
+            const resource = resources[this.resourceUrl];
+            const route = path.dirname(resource.url);
+            const { data } = resource;
 
-    data.tileSets.forEach((tileSet: any) => {
-      this.tileSets.push(new TileSet(route, tileSet));
+            this.background.beginFill(0x000000, 0);
+            this.background.drawRect(
+              0,
+              0,
+              (this._width || 0) * (this.tileWidth || 0),
+              (this._height || 0) * (this.tileHeight || 0)
+            );
+            this.background.endFill();
+            this.addChild(this.background);
+
+            data.tileSets.forEach((tileSet: any) => {
+              this.tileSets.push(new TileSet(route, tileSet));
+            });
+
+            data.layers.forEach((layerData: any) => {
+              switch (layerData.type) {
+                case 'tile': {
+                  const tileLayer = new TileLayer(layerData, this.tileSets);
+                  this.layers[layerData.name] = tileLayer;
+                  this.addChild(tileLayer);
+                  break;
+                }
+
+                case 'image': {
+                  const imageLayer = new ImageLayer(layerData, route);
+                  this.layers[layerData.name] = imageLayer as TileLayer;
+                  this.addChild(imageLayer);
+                  break;
+                }
+              }
+            });
+
+            resolve();
+          }
+        );
     });
-
-    data.layers.forEach((layerData: any) => {
-      switch (layerData.type) {
-        case 'tile': {
-          const tileLayer = new TileLayer(layerData, this.tileSets);
-          this.layers[layerData.name] = tileLayer;
-          this.addChild(tileLayer);
-          break;
-        }
-        case 'image': {
-          const imageLayer = new ImageLayer(layerData, route);
-          this.layers[layerData.name] = imageLayer as TileLayer;
-          this.addChild(imageLayer);
-          break;
-        }
-      }
-    });
-  };
+  }
 }

@@ -131,6 +131,7 @@ declare module 'pixi-tiledmap' {
   }
 
   export default class TiledMap extends PIXI.Container {
+    public load: () => Promise<void>;
     public resourceUrl: string;
     public tileSets: TileSet[];
     public layers: {

@@ -35,10 +35,12 @@ or include `pixi-tiledmap.js` after pixi.js in your html file.
   </head>
   <body>
     <script>
-      (() => {
+      (async () => {
         const app = new PIXI.Application();
 
-        const tileMap = new TiledMap('assets/tilemap.tmx');
+        const tilemap = new TiledMap('assets/tilemap.tmx');
+        await tilemap.load();
+
         this.app.stage.addChild(tileMap);
       })();
     </script>
@@ -52,10 +54,14 @@ or include `pixi-tiledmap.js` after pixi.js in your html file.
 import * as PIXI from 'pixi.js';
 import TiledMap from 'pixi-tiledmap';
 
-const app = new PIXI.Application();
+(async () => {
+  const app = new PIXI.Application();
 
-const tileMap = new TiledMap('assets/tilemap.tmx');
-this.app.stage.addChild(tileMap);
+  const tilemap = new TiledMap('assets/tilemap.tmx');
+  await tilemap.load();
+
+  this.app.stage.addChild(tilemap);
+})();
 ```
 
 ## License & disclaimer
