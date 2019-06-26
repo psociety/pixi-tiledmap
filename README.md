@@ -1,7 +1,8 @@
 # pixi-tiledmap
 
 **Fork of [riebel/pixi-tiledmap](https://github.com/riebel/pixi-tiledmap)**, updated for Pixi.js >=5.0.0
-**⚠️ Some of the types are incorrect
+
+**⚠️ Some of the types are incorrect**
 
 Use [Tiled Map Editor](http://www.mapeditor.org/) maps with [pixi.js](https://www.npmjs.com/package/pixi.js).
 
